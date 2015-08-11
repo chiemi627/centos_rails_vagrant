@@ -1,24 +1,57 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
+Dotenv.load
 
 Vagrant.configure(2) do |config|
 
+  
   config.vm.box = "chef/centos-6.5"
+
+  config.vm.provider :cloudstack do |cloudstack, override|
+    override.vm.box = "dummy"
+    override.vm.box_url = "https://github.com/schubergphilis/vagrant-cloudstack/raw/master/dummy.box"
+
+    # Configurations to use api
+    cloudstack.host	= "https"
+    cloudstack.host	= "compute.jp-east.idcfcloud.com"
+    cloudstack.path	= "/client/api"
+    cloudstack.port	= "443"
+    cloudstack.api_key  = "#{ENV['API_KEY']}"
+    cloudstack.secret_key = "#{ENV['SECRET_KEY']}"
+
+    cloudstack.template_name = "CentOS 6.5 64-bit for Vagrant"
+    cloudstack.zone_name = "pascal"
+    cloudstack.service_offering_name = "light.S1"
+    cloudstack.keypair = "#{ENV['KEY_PAIR']}"
+
+    cloudstack.port_forwarding_rules = [
+      {
+        :ipaddress => "#{ENV['IP_ADDRESS']}",
+        :protocol => "tcp", :publicport => 22, :privateport => 22,
+        :openfirewall => true
+      },
+      {
+        :ipaddress => "#{ENV['IP_ADDRESS']}",
+        :protocol => "tcp", :publicport => 80, :privateport => 80,
+        :openfirewall => true
+      },
+      {
+        :ipaddress => "#{ENV['IP_ADDRESS']}",
+        :protocol => "tcp", :publicport => 3000, :privateport => 3000,
+        :openfirewall => true
+      }
+    ]
+    
+    cloudstack.display_name = "centos6.5"
+    override.ssh.host = "#{ENV['IP_ADDRESS']}"
+    override.ssh.username = "vagrant"
+    override.ssh.private_key_path = "#{ENV['PRIV_KEY_PATH']}"
+
+  end
 
   config.vm.network :forwarded_port, guest: 80, host: 8080
   config.vm.network :forwarded_port, guest: 3000, host: 3000
   config.vm.network :private_network, ip: "192.168.33.10"
-
-  # config.vm.network "public_network"
-  # config.vm.synced_folder "../data", "/vagrant_data"
-
-  # config.vm.provider "virtualbox" do |vb|
-  #   # Display the VirtualBox GUI when booting the machine
-  #   vb.gui = true
-  #
-  #   # Customize the amount of memory on the VM:
-  #   vb.memory = "1024"
-  # end
 
   config.omnibus.chef_version = :latest
   config.berkshelf.enabled = true
