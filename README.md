@@ -9,41 +9,77 @@
 
 ## 準備
 
-- Vagrant
-- VirtualBox
-- Chef DK
+* Vagrant
+* VirtualBox
+* Chef DK
 
 ## Vagrantのプラグイン
-VagrantにChef，Berkshelfのプラグインを入れる．
+* VagrantにChef，Berkshelfのプラグインを入れる．
 
 ```bash
 vagrant plugin install vagrant-omnibus
 vagrant plugin install vagrant-berkshelf
+vagrant plugin install vagrant-cloudstack
+vagrant plugin install dotenv
 ```
 
-## 起動
+## VirtualBox上に仮想マシンを作成する場合
 
-レシピのインストール．
+### 起動
+
+* レシピのインストール．
 
 ```bash
-berks install
+% berks install
 ```
 
-起動する．
+* 起動する．
 
 ```bash
 vagrant up
 ```
 
-* 途中hubのインストールで"goがないよ"というエラーで落ちたら以下のコマンドで
-再度実行すると動くはず。
+## cloudstack上に仮想マシンを作成する場合
 
+### 準備
+* .envファイルを用意する
 ```bash
-vagrant provision
+% cp dot.env.sample .env
+```
+* .envファイルを開き、接続先について必要項目を埋める
+
+* Vagrantfileを開き89行目をコメントアウトする
+```
+ #chef.add_recipe "gems"
 ```
 
+### 起動
 
+```bash
+% berks install
+% vagrant up --provider=cloudstack
+```
 
+* 途中で以下のメッセージが表示されて止まってしまった場合には下記の対応をしてください。
+```bash
+==> default: sudo を実行するには tty がなければいけません。すみません
+```
 
+```bash
+% vagrant ssh
+vagrant@guestos> sudo visudo
+```
+viエディタで設定ファイルが開くので
+```bash
+ Defaults: requiretty
+ ```
+となっているところを
 
+```bash
+ Defaults: !requiretty
+```
+に変更して保存してログアウト。そのあと以下を実行。
 
+```bash
+% vagrant provision
+```
