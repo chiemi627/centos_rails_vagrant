@@ -30,6 +30,8 @@ Vagrant.configure(2) do |config|
 
   config.vm.provision "chef_solo" do |chef|
     chef.add_recipe  "apt"
+    chef.add_recipe  "yum"
+    chef.add_recipe  "emacs"
     chef.add_recipe  "git::default"
     chef.add_recipe  "git::source"
     chef.add_recipe  "git::windows"
@@ -39,7 +41,6 @@ Vagrant.configure(2) do |config|
     chef.add_recipe  "ruby_build"
     chef.add_recipe  "rbenv"
     chef.add_recipe  "sqlite"
-    chef.add_recipe  "yum"
     chef.add_recipe "mysql::server"
     chef.add_recipe "mysql::client"
     chef.add_recipe "postgresql"
@@ -56,7 +57,8 @@ Vagrant.configure(2) do |config|
     chef.add_recipe "golang"
     chef.add_recipe "hub"
     chef.add_recipe "rbenv-ruby"
-
+    chef.add_recipe "vim"
+    
     chef.json ={
       locale: {
         lang: "ja_JP.utf8",
@@ -66,7 +68,13 @@ Vagrant.configure(2) do |config|
         port:"3306",
         server_root_password:"vagrant",
         remove_anonymous_users:true
+      },
+      postgresql: {
+        password: {
+           postgres: "md5cae31bc247ad84a02394a8b12ff92d76"
+        }
       }
+	
     }
   end
 end

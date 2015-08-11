@@ -9,6 +9,7 @@
 
 bash 'install_hub' do
   code <<-BASH
+    export PATH=$PATH:/usr/local/go/bin
     git clone https://github.com/github/hub.git
     cd hub
     ./script/build
